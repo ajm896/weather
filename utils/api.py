@@ -72,7 +72,7 @@ def fetch_hourly_forecast() -> dict[str, dict]:
         dict[str, dict]: The JSON response from the API as a dictionary.
     """
     return requests.get(
-        BASE_URL + "forecast", headers={"User-Agent": USER_AGENT}
+        BASE_URL + "forecast/hourly", headers={"User-Agent": USER_AGENT}
     ).json()
 
 

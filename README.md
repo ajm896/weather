@@ -28,7 +28,14 @@ python -m pip install -r requirements.txt
 To update all cached forecasts, run:
 
 ```bash
-python -c "import utils.api as api; api.update_all_forecasts()"
+python main.py update-all
+```
+
+You can also display the latest forecasts directly:
+
+```bash
+python main.py show-hourly  # hourly forecast
+python main.py show-daily   # 12-hour forecast
 ```
 
 Cached JSON files (`cached_forecast_data.json`, `cached_hourly_data.json`, and `cached_raw_data.json`) will be written in the repository root. You can explore or further process these files with the models in `utils/models.py`.
