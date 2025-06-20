@@ -8,3 +8,5 @@ wheels/
 
 # Virtual environments
 .venv
+cached_hourly_data.json
+forecast.json
