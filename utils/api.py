@@ -6,6 +6,10 @@ NWS_Y = 68
 BASE_URL = f"https://api.weather.gov/gridpoints/GSP/{NWS_X},{NWS_Y}/"
 USER_AGENT = "weather-learner/1.0"
 
+CACHED_HOURLY_DATA = "cached_hourly_data.json"
+CACHED_FORCAST_DATA = "cached_forecast_data.json"
+CACHED_RAW_DATA = "cached_raw_data.json"
+
 
 def update_all_forecasts() -> None:
     """Update all forecast data by fetching from the NWS API."""
@@ -14,9 +18,9 @@ def update_all_forecasts() -> None:
     hourly_forecast_data = fetch_hourly_forecast()
     gridpoint_raw_data = fetch_gridpoint_raw_data()
 
-    cache_forecast(forecast_data, "forecast.json")
-    cache_forecast(hourly_forecast_data, "hourly_forecast.json")
-    cache_forecast(gridpoint_raw_data, "gridpoint_raw.json")
+    cache_forecast(forecast_data, CACHED_FORCAST_DATA)
+    cache_forecast(hourly_forecast_data, CACHED_HOURLY_DATA)
+    cache_forecast(gridpoint_raw_data, CACHED_RAW_DATA)
 
     print("All forecasts updated.")
 
