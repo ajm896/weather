@@ -10,3 +10,8 @@ wheels/
 .venv
 cached_hourly_data.json
 forecast.json
+cached_raw_data.json
+forecast.json
+gridpoint_raw.json
+hourly_forecast.json
+forecast.json
