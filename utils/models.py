@@ -1,8 +1,35 @@
+"""
+models.py
+
+Data models for weather forecast and gridpoint data, using Pydantic for validation and serialization.
+
+This module defines a set of Pydantic models representing the structure of weather forecast data as returned by the National Weather Service (NWS) API and similar sources. The models cover both 12-hour and hourly forecast periods, quantitative value layers, and GeoJSON features for spatial data. These models are used for parsing, validating, and working with weather data in a structured way throughout the application.
+
+Classes:
+    _QuantitativeValue: Represents a value with units (e.g., temperature, elevation).
+    _Gridpoint12hForecastPeriod: Represents a single 12-hour forecast period.
+    _GeoJsonGeometry: Represents the geometry section of a GeoJSON feature.
+    _Gridpoint12hForecast: Represents a 12-hour forecast for a gridpoint.
+    _GridpointHourlyForecastPeriod: Represents a single hourly forecast period.
+    _GridpointHourlyForecast: Represents an hourly forecast for a gridpoint.
+    _GridpointQuantitativeValueLayer: Represents a layer of quantitative values for a gridpoint (e.g., temperature, humidity).
+    _Gridpoint: Represents raw forecast data for a 2.5km grid square, including many possible weather data layers.
+    GridpointGeoJson: Represents a GeoJSON feature for gridpoint data.
+    Gridpoint12hForecastGeoJson: Represents a GeoJSON feature for 12-hour forecast data.
+    GridpointHourlyForecastGeoJson: Represents a GeoJSON feature for hourly forecast data.
+"""
+
 from pydantic import BaseModel
 
 
 class _QuantitativeValue(BaseModel):
-    """Probability of precipitation."""
+    """
+    Represents a quantitative value with units, such as temperature, elevation, or probability of precipitation.
+
+    Attributes:
+        value (int | float): The numeric value.
+        unitCode (str): The unit of measurement (e.g., 'wmoUnit:degC', 'wmoUnit:percent').
+    """
 
     value: int | float
     unitCode: str
@@ -12,7 +39,25 @@ class _QuantitativeValue(BaseModel):
 
 
 class _Gridpoint12hForecastPeriod(BaseModel):
-    """A single forecast period."""
+    """
+    Represents a single 12-hour forecast period, including temperature, precipitation, wind, and forecast text.
+
+    Attributes:
+        number (int): Sequence number of the period.
+        name (str): Name of the period (e.g., 'Tonight', 'Monday').
+        startTime (str): ISO8601 start time.
+        endTime (str): ISO8601 end time.
+        isDaytime (bool): True if the period is during the day.
+        temperature (int | None): Temperature value.
+        temperatureUnit (str | None): Unit of temperature.
+        temperatureTrend (str | None): Trend of temperature (e.g., 'rising').
+        probabilityOfPrecipitation (_QuantitativeValue | None): Probability of precipitation.
+        windSpeed (str | None): Wind speed as a string (e.g., '5 to 10 mph').
+        windDirection (str | None): Wind direction (e.g., 'NW').
+        icon (str | None): URL to an icon representing the forecast.
+        shortForecast (str | None): Short text summary.
+        detailedForecast (str | None): Detailed text summary.
+    """
 
     number: int
     name: str
@@ -34,12 +79,31 @@ class _Gridpoint12hForecastPeriod(BaseModel):
 
 
 class _GeoJsonGeometry(BaseModel):
+    """
+    Represents the geometry section of a GeoJSON feature, typically a polygon or multipolygon.
+
+    Attributes:
+        type (str): The geometry type (e.g., 'Polygon').
+        coordinates (list[list[list[float]]]): Coordinates of the geometry.
+    """
+
     type: str
     coordinates: list[list[list[float]]]
 
 
 class _Gridpoint12hForecast(BaseModel):
-    """A 12-hour forecast for a gridpoint."""
+    """
+    Represents a 12-hour forecast for a gridpoint, including metadata and a list of forecast periods.
+
+    Attributes:
+        units (str): Units of measurement.
+        forecastGenerator (str): Source of the forecast.
+        generatedAt (str): ISO8601 timestamp when generated.
+        updateTime (str): ISO8601 timestamp of last update.
+        validTimes (str): Valid time range for the forecast.
+        elevation (_QuantitativeValue): Elevation of the gridpoint.
+        periods (list[_Gridpoint12hForecastPeriod]): List of forecast periods.
+    """
 
     units: str
     forecastGenerator: str
@@ -51,7 +115,25 @@ class _Gridpoint12hForecast(BaseModel):
 
 
 class _GridpointHourlyForecastPeriod(BaseModel):
-    """A single hourly forecast period."""
+    """
+    Represents a single hourly forecast period, including temperature, precipitation, wind, and forecast text.
+
+    Attributes:
+        number (int): Sequence number of the period.
+        name (str): Name of the period (e.g., '1am').
+        startTime (str): ISO8601 start time.
+        endTime (str): ISO8601 end time.
+        isDaytime (bool): True if the period is during the day.
+        temperature (int | None): Temperature value.
+        temperatureUnit (str | None): Unit of temperature.
+        temperatureTrend (str | None): Trend of temperature.
+        probabilityOfPrecipitation (_QuantitativeValue | None): Probability of precipitation.
+        windSpeed (str | None): Wind speed as a string.
+        windDirection (str | None): Wind direction.
+        icon (str | None): URL to an icon representing the forecast.
+        shortForecast (str | None): Short text summary.
+        detailedForecast (str | None): Detailed text summary.
+    """
 
     number: int
     name: str
@@ -70,7 +152,18 @@ class _GridpointHourlyForecastPeriod(BaseModel):
 
 
 class _GridpointHourlyForecast(BaseModel):
-    """An hourly forecast for a gridpoint."""
+    """
+    Represents an hourly forecast for a gridpoint, including metadata and a list of hourly forecast periods.
+
+    Attributes:
+        units (str): Units of measurement.
+        forecastGenerator (str): Source of the forecast.
+        generatedAt (str): ISO8601 timestamp when generated.
+        updateTime (str): ISO8601 timestamp of last update.
+        validTimes (str): Valid time range for the forecast.
+        elevation (_QuantitativeValue): Elevation of the gridpoint.
+        periods (list[_GridpointHourlyForecastPeriod]): List of hourly forecast periods.
+    """
 
     units: str
     forecastGenerator: str
@@ -82,7 +175,13 @@ class _GridpointHourlyForecast(BaseModel):
 
 
 class _GridpointQuantitativeValueLayer(BaseModel):
-    """A layer of quantitative value data for a gridpoint."""
+    """
+    Represents a layer of quantitative value data for a gridpoint, such as temperature or humidity.
+
+    Attributes:
+        uom (str): Unit of measurement for the layer.
+        values (list[dict[str, int | float | str]]): List of value dictionaries for the layer.
+    """
 
     uom: str
     values: list[dict[str, int | float | str]]
@@ -93,68 +192,24 @@ class _GridpointQuantitativeValueLayer(BaseModel):
 
 class _Gridpoint(BaseModel):
     """
-    Raw forecast data for a 2.5km grid square.
-    This is a list of all potential data layers that may appear.
-    Some layers may not be present in all areas.
+    Represents raw forecast data for a 2.5km grid square, including many possible weather data layers.
 
-    temperature
-    dewpoint
-    maxTemperature
-    minTemperature
-    relativeHumidity
-    apparentTemperature
-    heatIndex
-    windChill
-    wetBulbGlobeTemperature
-    skyCover
-    windDirection
-    windSpeed
-    windGust
-    weather
-    hazards: Watch and advisory products in effect
-    probabilityOfPrecipitation
-    quantitativePrecipitation
-    iceAccumulation
-    snowfallAmount
-    snowLevel
-    ceilingHeight
-    visibility
-    transportWindSpeed
-    transportWindDirection
-    mixingHeight
-    hainesIndex
-    lightningActivityLevel
-    twentyFootWindSpeed
-    twentyFootWindDirection
-    waveHeight
-    wavePeriod
-    waveDirection
-    primarySwellHeight
-    primarySwellDirection
-    secondarySwellHeight
-    secondarySwellDirection
-    wavePeriod2
-    windWaveHeight
-    dispersionIndex
-    pressure: Barometric pressure
-    probabilityOfTropicalStormWinds
-    probabilityOfHurricaneWinds
-    potentialOf15mphWinds
-    potentialOf25mphWinds
-    potentialOf35mphWinds
-    potentialOf45mphWinds
-    potentialOf20mphWindGusts
-    potentialOf30mphWindGusts
-    potentialOf40mphWindGusts
-    potentialOf50mphWindGusts
-    potentialOf60mphWindGusts
-    grasslandFireDangerIndex
-    probabilityOfThunder
-    davisStabilityIndex
-    atmosphericDispersionIndex
-    lowVisibilityOccurrenceRiskIndex
-    stability
-    redFlagThreatIndex"""
+    Attributes:
+        updateTime (str): ISO8601 timestamp of last update.
+        validTimes (str): Valid time range for the forecast.
+        elevation (_QuantitativeValue): Elevation of the gridpoint.
+        forecastOffice (str): Forecast office identifier.
+        gridId (str): Grid identifier.
+        gridX (int): X coordinate of the gridpoint.
+        gridY (int): Y coordinate of the gridpoint.
+        temperature (_GridpointQuantitativeValueLayer | None): Temperature data layer.
+        dewpoint (_GridpointQuantitativeValueLayer | None): Dewpoint data layer.
+        maxTemperature (_GridpointQuantitativeValueLayer | None): Max temperature data layer.
+        minTemperature (_GridpointQuantitativeValueLayer | None): Min temperature data layer.
+        relativeHumidity (_GridpointQuantitativeValueLayer | None): Relative humidity data layer.
+        apparentTemperature (_GridpointQuantitativeValueLayer | None): Apparent temperature data layer.
+        # Additional layers may be present as described in the class docstring.
+    """
 
     updateTime: str
     validTimes: str
@@ -172,7 +227,14 @@ class _Gridpoint(BaseModel):
 
 
 class GridpointGeoJson(BaseModel):
-    """A GeoJSON feature for gridpoint data."""
+    """
+    Represents a GeoJSON feature for gridpoint data, including geometry and properties.
+
+    Attributes:
+        geometry (_GeoJsonGeometry): The geometry of the feature.
+        properties (_Gridpoint): The properties (weather data) of the feature.
+        type (str): The GeoJSON feature type (usually 'Feature').
+    """
 
     geometry: _GeoJsonGeometry
     properties: _Gridpoint
@@ -184,8 +246,13 @@ class GridpointGeoJson(BaseModel):
 
 
 class Gridpoint12hForecastGeoJson(BaseModel):
-    """A GeoJSON feature. Please refer to
-    IETF RFC 7946 for information on the GeoJSON format.
+    """
+    Represents a GeoJSON feature for 12-hour forecast data.
+
+    Attributes:
+        geometry (_GeoJsonGeometry): The geometry of the feature.
+        properties (_Gridpoint12hForecast): The 12-hour forecast properties.
+        type (str): The GeoJSON feature type.
     """
 
     geometry: _GeoJsonGeometry
@@ -194,7 +261,14 @@ class Gridpoint12hForecastGeoJson(BaseModel):
 
 
 class GridpointHourlyForecastGeoJson(BaseModel):
-    """A GeoJSON feature for hourly forecast data."""
+    """
+    Represents a GeoJSON feature for hourly forecast data.
+
+    Attributes:
+        geometry (_GeoJsonGeometry): The geometry of the feature.
+        properties (_GridpointHourlyForecast): The hourly forecast properties.
+        type (str): The GeoJSON feature type.
+    """
 
     geometry: _GeoJsonGeometry
     properties: _GridpointHourlyForecast
