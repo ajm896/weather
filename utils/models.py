@@ -19,6 +19,7 @@ Classes:
     GridpointHourlyForecastGeoJson: Represents a GeoJSON feature for hourly forecast data.
 """
 
+from typing import Any
 from pydantic import BaseModel
 
 
@@ -90,6 +91,9 @@ class _GeoJsonGeometry(BaseModel):
     type: str
     coordinates: list[list[list[float]]]
 
+    def __str__(self) -> str:
+        return f"Geometry:\ntype: {self.type}\ncoordinates:\n{self.coordinates})"
+
 
 class _Gridpoint12hForecast(BaseModel):
     """
@@ -112,6 +116,19 @@ class _Gridpoint12hForecast(BaseModel):
     validTimes: str
     elevation: _QuantitativeValue
     periods: list[_Gridpoint12hForecastPeriod]
+
+    def __str__(self) -> str:
+        return f"""
+Gridpoint 12h Forecast:
+Units: {self.units}
+ForecastGenerator: {self.forecastGenerator}
+GeneratedAt: {self.generatedAt}
+UpdateTime: {self.updateTime}
+ValidTimes: {self.validTimes}
+Elevation: {self.elevation}
+
+Periods: {", \n".join(str(period) for period in self.periods)}
+        """
 
 
 class _GridpointHourlyForecastPeriod(BaseModel):
@@ -174,6 +191,14 @@ class _GridpointHourlyForecast(BaseModel):
     periods: list[_GridpointHourlyForecastPeriod]
 
 
+class _GridpointQuantitativeValue(BaseModel):
+    validTime: str
+    value: Any
+
+    def __str__(self) -> str:
+        return f"{self.validTime} --> {self.value}"
+
+
 class _GridpointQuantitativeValueLayer(BaseModel):
     """
     Represents a layer of quantitative value data for a gridpoint, such as temperature or humidity.
@@ -184,10 +209,10 @@ class _GridpointQuantitativeValueLayer(BaseModel):
     """
 
     uom: str
-    values: list[dict[str, int | float | str]]
+    values: list[_GridpointQuantitativeValue]
 
     def __str__(self) -> str:
-        return f"{self.values} {self.uom}"
+        return f"{self.uom.split(':')[1]}: \n{',\n'.join(str(value) for value in self.values)}"
 
 
 class _Gridpoint(BaseModel):
@@ -225,6 +250,33 @@ class _Gridpoint(BaseModel):
     relativeHumidity: _GridpointQuantitativeValueLayer | None = None
     apparentTemperature: _GridpointQuantitativeValueLayer | None = None
 
+    def __str__(self) -> str:
+        return """
+Gridpoint:
+updateTime: {self.updateTime}
+validTimes: {self.validTimes}
+
+elevation: {self.elevation}
+
+forecastOffice: {self.forecastOffice}
+gridId: {self.gridId}
+
+gridX: {self.gridX}
+gridY: {self.gridY}
+
+temperature: {self.temperature}
+
+dewpoint: {self.dewpoint}
+
+maxTemperature: {self.maxTemperature}
+
+minTemperature: {self.minTemperature}
+
+relativeHumidity: {self.relativeHumidity}
+
+apparentTemperature: {self.apparentTemperature}
+        """.format(self=self)
+
 
 class GridpointGeoJson(BaseModel):
     """
@@ -242,7 +294,7 @@ class GridpointGeoJson(BaseModel):
     type: str
 
     def __str__(self) -> str:
-        return f"GridpointGeoJson(type={self.type}, properties={self.properties})"
+        return f"{self.geometry}\n{self.properties})"
 
 
 class Gridpoint12hForecastGeoJson(BaseModel):
@@ -258,6 +310,9 @@ class Gridpoint12hForecastGeoJson(BaseModel):
     geometry: _GeoJsonGeometry
     properties: _Gridpoint12hForecast
     type: str
+
+    def __str__(self) -> str:
+        return f"{self.geometry}\n\n{self.properties})"
 
 
 class GridpointHourlyForecastGeoJson(BaseModel):
