@@ -40,11 +40,6 @@ def _print_daily(data: dict) -> None:
 def main(argv: Optional[list[str]] = None) -> None:
     """Entry point for the CLI."""
     parser = argparse.ArgumentParser(description="Weather forecast utilities")
-    sub_cmd = parser.add_subparsers(dest="command")
-
-    sub_cmd.add_parser("update-all", help="Fetch and cache all forecasts")
-    sub_cmd.add_parser("show-hourly", help="Display the latest hourly forecast")
-    sub_cmd.add_parser("show-daily", help="Display the latest 12h forecast")
 
     parser.add_argument(
         "-l",
@@ -53,15 +48,21 @@ def main(argv: Optional[list[str]] = None) -> None:
         default="home",
         help="Location to fetch the forecast for",
     )
+
+    sub_cmd = parser.add_subparsers(dest="command")
+    sub_cmd.add_parser("update-all", help="Fetch and cache all forecasts")
+    sub_cmd.add_parser("show-hourly", help="Display the latest hourly forecast")
+    sub_cmd.add_parser("show-daily", help="Display the latest 12h forecast")
+
     args = parser.parse_args(argv)
 
     if args.command == "update-all":
         api.update_all_forecasts(args.location.lower())
     elif args.command == "show-hourly":
-        data = api.fetch_hourly_forecast(args.location.lower())
+        data = api.fetch_hourly_forecast(GRID_POINTS[args.location.lower()])
         _print_hourly(data)
     elif args.command == "show-daily":
-        data = api.fetch_forecast(args.location.lower())
+        data = api.fetch_forecast(GRID_POINTS[args.location.lower()])
         _print_daily(data)
     else:
         parser.print_help()

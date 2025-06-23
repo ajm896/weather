@@ -65,7 +65,7 @@ def fetch_forecast(location: tuple[int, int]) -> dict[str, dict]:
         dict[str, dict]: The JSON response from the API as a dictionary.
     """
     return requests.get(
-        f"{BASE_URL}{location[0]}{location[1]}/forecast",
+        f"{BASE_URL}{location[0]},{location[1]}/forecast",
         headers={"User-Agent": USER_AGENT},
     ).json()
 
@@ -78,7 +78,7 @@ def fetch_hourly_forecast(location: tuple[int, int]) -> dict[str, dict]:
         dict[str, dict]: The JSON response from the API as a dictionary.
     """
     return requests.get(
-        f"{BASE_URL}{location[0]}{location[1]}/forecast/hourly",
+        f"{BASE_URL}{location[0]},{location[1]}/forecast/hourly",
         headers={"User-Agent": USER_AGENT},
     ).json()
 
@@ -91,7 +91,7 @@ def fetch_gridpoint_raw_data(location: tuple[int, int]) -> dict[str, dict]:
         dict[str, dict]: The JSON response from the API as a dictionary.
     """
     return requests.get(
-        f"{BASE_URL}{location[0]}{location[1]}", headers={"User-Agent": USER_AGENT}
+        f"{BASE_URL}{location[0]},{location[1]}", headers={"User-Agent": USER_AGENT}
     ).json()
 
 
