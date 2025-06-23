@@ -37,6 +37,7 @@ class _QuantitativeValue(BaseModel):
     unitCode: str
 
     def __str__(self) -> str:
+        """Return a friendly representation like ``"{value} {unit}"``."""
         return f"{self.value} {self.unitCode}"
 
 
@@ -77,6 +78,7 @@ class _Gridpoint12hForecastPeriod(BaseModel):
     detailedForecast: str | None = None
 
     def __str__(self) -> str:
+        """Return ``"{name}: {forecast}"`` for quick display."""
         return f"{self.name}: {self.detailedForecast or self.shortForecast or 'No forecast available'}"
 
 
@@ -93,6 +95,7 @@ class _GeoJsonGeometry(BaseModel):
     coordinates: list[list[list[float]]]
 
     def __str__(self) -> str:
+        """Return a readable summary of the geometry."""
         return f"Geometry:\ntype: {self.type}\n\nCoordinates:\n{self.coordinates})"
 
 
@@ -119,6 +122,7 @@ class _Gridpoint12hForecast(BaseModel):
     periods: list[_Gridpoint12hForecastPeriod]
 
     def __str__(self) -> str:
+        """Return a detailed multiline description of the forecast."""
         return f"""
 Gridpoint 12h Forecast:
 Units: {self.units}
@@ -170,6 +174,7 @@ class _GridpointHourlyForecastPeriod(BaseModel):
     detailedForecast: str | None = None
 
     def __str__(self) -> str:
+        """Return the start time and brief forecast for one hour."""
         starttime = datetime.fromisoformat(self.startTime)
         return f"{starttime.ctime()}: {self.detailedForecast or self.shortForecast or 'No forecast available'}"
 
@@ -197,6 +202,7 @@ class _GridpointHourlyForecast(BaseModel):
     periods: list[_GridpointHourlyForecastPeriod]
 
     def __str__(self) -> str:
+        """Return a multiline representation of the hourly forecast."""
         return f"""
 Gridpoint Hourly Forecast:
 Units: {self.units}
@@ -216,6 +222,7 @@ class _GridpointQuantitativeValue(BaseModel):
     value: Any
 
     def __str__(self) -> str:
+        """Return ``"{timestamp} --> {value}"``."""
         return f"{self.validTime} --> {self.value}"
 
 
@@ -232,6 +239,7 @@ class _GridpointQuantitativeValueLayer(BaseModel):
     values: list[_GridpointQuantitativeValue]
 
     def __str__(self) -> str:
+        """Return a line-per-value listing of the layer contents."""
         return f"{self.uom.split(':')[1]}: \n{',\n'.join(str(value) for value in self.values)}"
 
 
@@ -271,6 +279,7 @@ class _Gridpoint(BaseModel):
     apparentTemperature: _GridpointQuantitativeValueLayer | None = None
 
     def __str__(self) -> str:
+        """Return a multiline summary of the gridpoint's weather data."""
         return """
 Gridpoint:
 updateTime: {self.updateTime}
@@ -314,6 +323,7 @@ class GridpointGeoJson(BaseModel):
     type: str
 
     def __str__(self) -> str:
+        """Return geometry followed by properties."""
         return f"{self.geometry}\n{self.properties})"
 
 
@@ -332,6 +342,7 @@ class Gridpoint12hForecastGeoJson(BaseModel):
     type: str
 
     def __str__(self) -> str:
+        """Return geometry and forecast details separated by a blank line."""
         return f"{self.geometry}\n\n{self.properties})"
 
 
@@ -350,4 +361,5 @@ class GridpointHourlyForecastGeoJson(BaseModel):
     type: str
 
     def __str__(self) -> str:
+        """Return geometry and hourly forecast details separated by a blank line."""
         return f"{self.geometry}\n\n{self.properties})"

@@ -19,6 +19,8 @@ from typing import Optional
 
 from utils import api
 
+# Mapping from location labels to NWS grid coordinates
+# used throughout the CLI.
 GRID_POINTS = {
     "home": (40, 68),
     "work": (56, 70),
