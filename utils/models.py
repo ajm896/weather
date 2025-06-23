@@ -127,7 +127,7 @@ UpdateTime: {self.updateTime}
 ValidTimes: {self.validTimes}
 Elevation: {self.elevation}
 
-Periods: {", \n".join(str(period) for period in self.periods)}
+Periods: {"\n\n".join(str(period) for period in self.periods)}
         """
 
 
