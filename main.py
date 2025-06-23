@@ -7,6 +7,13 @@ from typing import Optional
 
 from utils import api
 
+GRID_POINTS = {
+    "home": (40, 68),
+    "work": (56, 70),
+    "church": (34, 60),
+    "ehhs": (61, 62),
+}
+
 
 def _print_hourly(data: dict) -> None:
     """Print a simple summary of hourly forecast data."""
@@ -33,21 +40,28 @@ def _print_daily(data: dict) -> None:
 def main(argv: Optional[list[str]] = None) -> None:
     """Entry point for the CLI."""
     parser = argparse.ArgumentParser(description="Weather forecast utilities")
-    sub = parser.add_subparsers(dest="command")
+    sub_cmd = parser.add_subparsers(dest="command")
 
-    sub.add_parser("update-all", help="Fetch and cache all forecasts")
-    sub.add_parser("show-hourly", help="Display the latest hourly forecast")
-    sub.add_parser("show-daily", help="Display the latest 12h forecast")
+    sub_cmd.add_parser("update-all", help="Fetch and cache all forecasts")
+    sub_cmd.add_parser("show-hourly", help="Display the latest hourly forecast")
+    sub_cmd.add_parser("show-daily", help="Display the latest 12h forecast")
 
+    parser.add_argument(
+        "-l",
+        "--location",
+        choices=GRID_POINTS.keys(),
+        default="home",
+        help="Location to fetch the forecast for",
+    )
     args = parser.parse_args(argv)
 
     if args.command == "update-all":
-        api.update_all_forecasts()
+        api.update_all_forecasts(args.location.lower())
     elif args.command == "show-hourly":
-        data = api.fetch_hourly_forecast()
+        data = api.fetch_hourly_forecast(args.location.lower())
         _print_hourly(data)
     elif args.command == "show-daily":
-        data = api.fetch_forecast()
+        data = api.fetch_forecast(args.location.lower())
         _print_daily(data)
     else:
         parser.print_help()
@@ -55,4 +69,3 @@ def main(argv: Optional[list[str]] = None) -> None:
 
 if __name__ == "__main__":
     main()
-

@@ -23,17 +23,22 @@ Functions:
 import requests
 import json
 
-NWS_X = 40
-NWS_Y = 68
-BASE_URL = f"https://api.weather.gov/gridpoints/GSP/{NWS_X},{NWS_Y}/"
+BASE_URL = "https://api.weather.gov/gridpoints/GSP/"
 USER_AGENT = "weather-learner/1.0"
+
+GRID_POINTS = {
+    "home": (40, 68),
+    "work": (56, 70),
+    "church": (34, 60),
+    "ehhs": (61, 62),
+}
 
 CACHED_HOURLY_DATA = "cached_hourly_data.json"
 CACHED_FORCAST_DATA = "cached_forecast_data.json"
 CACHED_RAW_DATA = "cached_raw_data.json"
 
 
-def update_all_forecasts() -> None:
+def update_all_forecasts(location: str) -> None:
     """
     Update all forecast data by fetching from the NWS API and caching the results locally.
 
@@ -41,18 +46,18 @@ def update_all_forecasts() -> None:
     then saves each to its respective cache file.
     """
     print("Fetching latest forecast data...")
-    forecast_data = fetch_forecast()
-    hourly_forecast_data = fetch_hourly_forecast()
-    gridpoint_raw_data = fetch_gridpoint_raw_data()
+    forecast_data = fetch_forecast(GRID_POINTS[location])
+    hourly_forecast_data = fetch_hourly_forecast(GRID_POINTS[location])
+    gridpoint_raw_data = fetch_gridpoint_raw_data(GRID_POINTS[location])
 
-    cache_forecast(forecast_data, CACHED_FORCAST_DATA)
-    cache_forecast(hourly_forecast_data, CACHED_HOURLY_DATA)
-    cache_forecast(gridpoint_raw_data, CACHED_RAW_DATA)
+    cache_forecast(forecast_data, f"{location}_CACHED_FORCAST_DATA.json")
+    cache_forecast(hourly_forecast_data, f"{location}_CACHED_HOURLY_DATA.json")
+    cache_forecast(gridpoint_raw_data, f"{location}_CACHED_RAW_DATA.json")
 
     print("All forecasts updated.")
 
 
-def fetch_forecast() -> dict[str, dict]:
+def fetch_forecast(location: tuple[int, int]) -> dict[str, dict]:
     """
     Fetch the latest 12-hour forecast data from the NWS API.
 
@@ -60,11 +65,12 @@ def fetch_forecast() -> dict[str, dict]:
         dict[str, dict]: The JSON response from the API as a dictionary.
     """
     return requests.get(
-        BASE_URL + "forecast", headers={"User-Agent": USER_AGENT}
+        f"{BASE_URL}{location[0]}{location[1]}/forecast",
+        headers={"User-Agent": USER_AGENT},
     ).json()
 
 
-def fetch_hourly_forecast() -> dict[str, dict]:
+def fetch_hourly_forecast(location: tuple[int, int]) -> dict[str, dict]:
     """
     Fetch the latest hourly forecast data from the NWS API.
 
@@ -72,18 +78,21 @@ def fetch_hourly_forecast() -> dict[str, dict]:
         dict[str, dict]: The JSON response from the API as a dictionary.
     """
     return requests.get(
-        BASE_URL + "forecast/hourly", headers={"User-Agent": USER_AGENT}
+        f"{BASE_URL}{location[0]}{location[1]}/forecast/hourly",
+        headers={"User-Agent": USER_AGENT},
     ).json()
 
 
-def fetch_gridpoint_raw_data() -> dict[str, dict]:
+def fetch_gridpoint_raw_data(location: tuple[int, int]) -> dict[str, dict]:
     """
     Fetch the latest raw gridpoint forecast data from the NWS API.
 
     Returns:
         dict[str, dict]: The JSON response from the API as a dictionary.
     """
-    return requests.get(BASE_URL, headers={"User-Agent": USER_AGENT}).json()
+    return requests.get(
+        f"{BASE_URL}{location[0]}{location[1]}", headers={"User-Agent": USER_AGENT}
+    ).json()
 
 
 def load_cached_data(filename: str) -> dict[str, dict]:
