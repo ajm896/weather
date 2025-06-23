@@ -9,3 +9,4 @@ wheels/
 # Virtual environments
 .venv
 *_data.json
+weather_map.html
