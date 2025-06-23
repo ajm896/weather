@@ -76,7 +76,7 @@ class _Gridpoint12hForecastPeriod(BaseModel):
     detailedForecast: str | None = None
 
     def __str__(self) -> str:
-        return f"{self.name} ({self.startTime} - {self.endTime}): {self.shortForecast or self.detailedForecast or 'No forecast available'}"
+        return f"{self.name}: {self.shortForecast or self.detailedForecast or 'No forecast available'}"
 
 
 class _GeoJsonGeometry(BaseModel):
