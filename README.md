@@ -19,10 +19,12 @@ This repository contains a small set of utilities for working with the [National
 
 ## Usage
 
-The utilities assume Python `3.13+`. Install dependencies from the provided lock file or `requirements.txt`:
+The utilities assume Python `3.13+`. Install dependencies using the
+[uv](https://github.com/astral-sh/uv) package manager from the provided lock
+file or `requirements.txt`:
 
 ```bash
-python -m pip install -r requirements.txt
+uv pip install -r requirements.txt
 ```
 
 To update all cached forecasts for a given location, run:
