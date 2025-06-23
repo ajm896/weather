@@ -105,7 +105,7 @@ def load_cached_data(filename: str) -> dict[str, dict]:
         dict[str, dict]: The cached data as a dictionary, or an empty dict if the file does not exist.
     """
     try:
-        with open(filename, "r") as f:
+        with open(f"data/{filename}", "r") as f:
             import json
 
             return json.load(f)
@@ -121,6 +121,6 @@ def cache_forecast(forecast_data, filename) -> None:
         forecast_data: The data to be cached (should be serializable to JSON).
         filename: The path to the cache file.
     """
-    with open(filename, "w") as f:
+    with open(f"data/{filename}", "w") as f:
         json.dump(forecast_data, f, indent=4)
     print("Forecast data saved to forecast.json")
