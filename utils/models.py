@@ -19,6 +19,7 @@ Classes:
     GridpointHourlyForecastGeoJson: Represents a GeoJSON feature for hourly forecast data.
 """
 
+from datetime import datetime
 from typing import Any
 from pydantic import BaseModel
 
@@ -76,7 +77,7 @@ class _Gridpoint12hForecastPeriod(BaseModel):
     detailedForecast: str | None = None
 
     def __str__(self) -> str:
-        return f"{self.name}: {self.shortForecast or self.detailedForecast or 'No forecast available'}"
+        return f"{self.name}: {self.detailedForecast or self.shortForecast or 'No forecast available'}"
 
 
 class _GeoJsonGeometry(BaseModel):
@@ -92,7 +93,7 @@ class _GeoJsonGeometry(BaseModel):
     coordinates: list[list[list[float]]]
 
     def __str__(self) -> str:
-        return f"Geometry:\ntype: {self.type}\ncoordinates:\n{self.coordinates})"
+        return f"Geometry:\ntype: {self.type}\n\nCoordinates:\n{self.coordinates})"
 
 
 class _Gridpoint12hForecast(BaseModel):
@@ -127,7 +128,8 @@ UpdateTime: {self.updateTime}
 ValidTimes: {self.validTimes}
 Elevation: {self.elevation}
 
-Periods: {"\n\n".join(str(period) for period in self.periods)}
+Periods:
+{"\n\n".join(str(period) for period in self.periods)}
         """
 
 
@@ -167,6 +169,10 @@ class _GridpointHourlyForecastPeriod(BaseModel):
     shortForecast: str | None = None
     detailedForecast: str | None = None
 
+    def __str__(self) -> str:
+        starttime = datetime.fromisoformat(self.startTime)
+        return f"{starttime.ctime()}: {self.detailedForecast or self.shortForecast or 'No forecast available'}"
+
 
 class _GridpointHourlyForecast(BaseModel):
     """
@@ -189,6 +195,20 @@ class _GridpointHourlyForecast(BaseModel):
     validTimes: str
     elevation: _QuantitativeValue
     periods: list[_GridpointHourlyForecastPeriod]
+
+    def __str__(self) -> str:
+        return f"""
+Gridpoint Hourly Forecast:
+Units: {self.units}
+ForecastGenerator: {self.forecastGenerator}
+GeneratedAt: {self.generatedAt}
+UpdateTime: {self.updateTime}
+ValidTimes: {self.validTimes}
+Elevation: {self.elevation}
+
+Periods: 
+{"\n\n".join(str(period) for period in self.periods)}
+"""
 
 
 class _GridpointQuantitativeValue(BaseModel):
@@ -328,3 +348,6 @@ class GridpointHourlyForecastGeoJson(BaseModel):
     geometry: _GeoJsonGeometry
     properties: _GridpointHourlyForecast
     type: str
+
+    def __str__(self) -> str:
+        return f"{self.geometry}\n\n{self.properties})"
