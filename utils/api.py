@@ -23,9 +23,12 @@ Functions:
 import requests
 import json
 
+# Base URL for NWS gridpoint API requests
 BASE_URL = "https://api.weather.gov/gridpoints/GSP/"
+# Identifier sent with HTTP requests
 USER_AGENT = "weather-learner/1.0"
 
+# Mapping from location labels to NWS grid coordinates
 GRID_POINTS = {
     "home": (40, 68),
     "work": (56, 70),
@@ -33,6 +36,7 @@ GRID_POINTS = {
     "ehhs": (61, 62),
 }
 
+# Default filenames for cached responses
 CACHED_HOURLY_DATA = "cached_hourly_data.json"
 CACHED_FORCAST_DATA = "cached_forecast_data.json"
 CACHED_RAW_DATA = "cached_raw_data.json"
