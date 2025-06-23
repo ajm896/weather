@@ -1,4 +1,16 @@
-"""Command line interface for the weather utilities."""
+"""
+Command line interface for the weather utilities.
+
+This module provides a CLI for interacting with weather forecast data using the utilities in utils.api. It allows users to fetch and cache forecasts, and display hourly or daily summaries for predefined locations.
+
+Functions:
+    _print_hourly(data): Print a summary of hourly forecast data.
+    _print_daily(data): Print a summary of 12-hour forecast data.
+    main(argv): Entry point for the CLI, parses arguments and dispatches commands.
+
+Usage:
+    python main.py [--location LOCATION] {update-all, show-hourly, show-daily}
+"""
 
 from __future__ import annotations
 
@@ -16,7 +28,12 @@ GRID_POINTS = {
 
 
 def _print_hourly(data: dict) -> None:
-    """Print a simple summary of hourly forecast data."""
+    """
+    Print a simple summary of hourly forecast data to the console.
+
+    Args:
+        data (dict): The forecast data dictionary as returned by the API.
+    """
     periods = data.get("properties", {}).get("periods", [])
     for period in periods:
         temp = period.get("temperature")
@@ -27,7 +44,12 @@ def _print_hourly(data: dict) -> None:
 
 
 def _print_daily(data: dict) -> None:
-    """Print a simple summary of 12 hour forecast data."""
+    """
+    Print a simple summary of 12-hour forecast data to the console.
+
+    Args:
+        data (dict): The forecast data dictionary as returned by the API.
+    """
     periods = data.get("properties", {}).get("periods", [])
     for period in periods:
         name = period.get("name")
@@ -38,7 +60,12 @@ def _print_daily(data: dict) -> None:
 
 
 def main(argv: Optional[list[str]] = None) -> None:
-    """Entry point for the CLI."""
+    """
+    Entry point for the CLI. Parses command-line arguments and dispatches to the appropriate command.
+
+    Args:
+        argv (Optional[list[str]]): List of command-line arguments. If None, uses sys.argv.
+    """
     parser = argparse.ArgumentParser(description="Weather forecast utilities")
 
     parser.add_argument(
