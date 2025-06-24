@@ -20,8 +20,8 @@ Classes:
 """
 
 from datetime import datetime
-from typing import Any
 from pydantic import BaseModel
+from typing import Any, Union, Literal
 
 
 class _QuantitativeValue(BaseModel):
@@ -363,3 +363,20 @@ class GridpointHourlyForecastGeoJson(BaseModel):
     def __str__(self) -> str:
         """Return geometry and hourly forecast details separated by a blank line."""
         return f"{self.geometry}\n\n{self.properties})"
+
+
+class ForecastData(BaseModel):
+    type: Literal["gridpoint", "12h", "hourly"]
+    data: Union[
+        GridpointGeoJson, Gridpoint12hForecastGeoJson, GridpointHourlyForecastGeoJson
+    ]
+
+    def getForecast(self) -> dict[str, Any]:
+        """
+        Returns the forecast data as a dictionary.
+        This is useful for serialization or further processing.
+        """
+        return self.data.properties.model_dump()
+
+    def __str__(self):
+        return f"{self.type}: {self.data}"

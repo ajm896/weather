@@ -24,6 +24,8 @@ import logging
 import requests
 import json
 
+from Weather import models
+
 # Base URL for NWS gridpoint API requests
 BASE_URL = "https://api.weather.gov/gridpoints/GSP/"
 # Identifier sent with HTTP requests
@@ -109,22 +111,41 @@ def fetch_gridpoint_raw_data(location: tuple[int, int]) -> dict[str, dict]:
     ).json()
 
 
-def load_cached_data(filename: str) -> dict[str, dict]:
+def load_cached_data(filename: str) -> models.ForecastData | None:
     """
     Load cached forecast data from a file in the data/ directory.
 
     Args:
         filename (str): The name of the cache file (relative to the data/ directory).
     Returns:
-        dict[str, dict]: The cached data as a dictionary, or an empty dict if the file does not exist.
+        models.ForecastData: The cached data as a ForecastData object, or None if the file does not exist.
     """
     try:
         with open(f"data/{filename}", "r") as f:
             import json
 
-            return json.load(f)
+            raw_data = json.load(f)
+
+            # Determine the forecast type based on filename pattern and create appropriate model
+            if "FORCAST_DATA" in filename:  # 12-hour forecast
+                geojson_data = models.Gridpoint12hForecastGeoJson(**raw_data)
+                return models.ForecastData(type="12h", data=geojson_data)
+            elif "HOURLY_DATA" in filename:  # Hourly forecast
+                hourly_geojson_data = models.GridpointHourlyForecastGeoJson(**raw_data)
+                return models.ForecastData(type="hourly", data=hourly_geojson_data)
+            elif "RAW_DATA" in filename:  # Raw gridpoint data
+                raw_geojson_data = models.GridpointGeoJson(**raw_data)
+                return models.ForecastData(type="gridpoint", data=raw_geojson_data)
+            else:
+                # Default to 12h forecast if pattern doesn't match
+                default_geojson_data = models.Gridpoint12hForecastGeoJson(**raw_data)
+                return models.ForecastData(type="12h", data=default_geojson_data)
+
     except FileNotFoundError:
-        return {}
+        return None
+    except Exception as e:
+        logging.error(f"Error loading cached data from {filename}: {e}")
+        return None
 
 
 def cache_forecast(forecast_data, filename) -> None:

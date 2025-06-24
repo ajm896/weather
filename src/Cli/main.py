@@ -17,7 +17,7 @@ from __future__ import annotations
 import argparse
 from typing import Optional
 
-from weather import api
+from Weather import api
 
 # Mapping from location labels to NWS grid coordinates
 # used throughout the CLI.
