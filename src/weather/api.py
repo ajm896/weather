@@ -20,6 +20,7 @@ Functions:
     cache_forecast(forecast_data, filename): Saves forecast data to a file in the data/ directory in JSON format.
 """
 
+import logging
 import requests
 import json
 
@@ -136,4 +137,4 @@ def cache_forecast(forecast_data, filename) -> None:
     """
     with open(f"data/{filename}", "w") as f:
         json.dump(forecast_data, f, indent=4)
-    print("Forecast data saved to forecast.json")
+    logging.log(msg=f"Forecast data saved to {filename}", level=logging.INFO)
