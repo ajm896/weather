@@ -9,7 +9,7 @@ Functions:
     main(argv): Entry point for the CLI, parses arguments and dispatches commands.
 
 Usage:
-    python main.py [--location LOCATION] {update-all, show-hourly, show-daily}
+    python main.py {update-all, show-hourly, show-daily} [--location LOCATION]
 """
 
 from __future__ import annotations
