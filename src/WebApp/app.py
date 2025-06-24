@@ -10,16 +10,16 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 html_dir = PROJECT_ROOT / "static" / "html"
 
 
-def get_weather_data() -> models.ForecastData | None:
+def get_weather_data(location: str) -> models.ForecastData | None:
     """
     Fetches weather data from cached NWS API data.
     """
-    return api.load_cached_data("work_CACHED_FORECAST_DATA.json")
+    return api.load_cached_data(f"{location}_CACHED_FORECAST_DATA.json")
 
 
-@app.get("/api/weather")
-async def weather_api():
-    weatherData = get_weather_data()
+@app.get("/api/weather/{location}")
+async def weather_api(location: str):
+    weatherData = get_weather_data(location)
     if weatherData is None:
         return {"error": "No weather data available."}
     forecast_data = weatherData.getForecast()
