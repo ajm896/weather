@@ -3,61 +3,31 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Minimal API Demo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Forecast</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
-<body>
-    <!-- 1. Container for your data -->
-    <h1>Weather Data</h1>
-    <div id="output">Loading…</div>
+<body class="bg-gradient-to-br from-blue-400 via-blue-500 to-blue-600 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <!-- 1. Container for your data -->
+        <h1 class="text-4xl font-bold text-white text-center mb-8 drop-shadow-lg">Weather Forecast</h1>
+        <div id="weather" class="text-center text-white text-lg">
+            <div class="inline-flex items-center">
+                <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none"
+                    viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                    </path>
+                </svg>
+                Loading weather data...
+            </div>
+        </div>
+    </div>
 
-    <!-- 2. Inline script to fetch, parse, display -->
-    <script>
-        // replace with your real endpoint
-        const API_URL = 'http://127.0.0.1:8000/api/weather';
-
-        fetch(API_URL)
-            .then(res => {
-                if (!res.ok) throw new Error(res.statusText);
-                return res.text(); // Get as text first
-            })
-            .then(textData => {
-                // Parse JSON manually to handle potential string responses
-                let data;
-                try {
-                    data = typeof textData === 'string' ? JSON.parse(textData) : textData;
-                } catch (e) {
-                    throw new Error('Invalid JSON response');
-                }
-
-                // find the container…
-                const out = document.getElementById('output');
-
-                // Clear loading message
-                out.innerHTML = '';
-
-                // Access the periods array from weatherData
-                let forecast = data.weatherData?.periods;
-
-                if (Array.isArray(forecast)) {
-                    forecast.forEach((f, index) => {
-                        console.log('Period:', f);
-                        const el = document.createElement('div');
-                        el.id = 'period_' + index;
-                        el.textContent = f.name + ': ' + f.temperature + '°F';
-                        out.appendChild(el);
-                    });
-                } else {
-                    // If not an array, display the raw data for debugging
-                    out.textContent = JSON.stringify(data, null, 2);
-                }
-            })
-            .catch(err => {
-                document.getElementById('output').textContent =
-                    'Error: ' + err.message;
-                console.error(err);
-            });
-    </script>
+    <!-- 2. External script to fetch, parse, display -->
+    <script src="script.js"></script>
 </body>
 
 </html>

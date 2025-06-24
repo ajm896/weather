@@ -60,7 +60,7 @@ def update_all_forecasts(location: str) -> None:
     hourly_forecast_data = fetch_hourly_forecast(GRID_POINTS[location])
     gridpoint_raw_data = fetch_gridpoint_raw_data(GRID_POINTS[location])
 
-    cache_forecast(forecast_data, f"{location}_CACHED_FORCAST_DATA.json")
+    cache_forecast(forecast_data, f"{location}_CACHED_FORECAST_DATA.json")
     cache_forecast(hourly_forecast_data, f"{location}_CACHED_HOURLY_DATA.json")
     cache_forecast(gridpoint_raw_data, f"{location}_CACHED_RAW_DATA.json")
 

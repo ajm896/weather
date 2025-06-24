@@ -14,7 +14,7 @@ def get_weather_data() -> models.ForecastData | None:
     """
     Fetches weather data from cached NWS API data.
     """
-    return api.load_cached_data("work_CACHED_FORCAST_DATA.json")
+    return api.load_cached_data("work_CACHED_FORECAST_DATA.json")
 
 
 @app.get("/api/weather")
