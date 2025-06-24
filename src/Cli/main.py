@@ -18,6 +18,7 @@ import argparse
 from typing import Optional
 
 from Weather import api
+from Weather.models import ForecastData
 
 # Mapping from location labels to NWS grid coordinates
 # used throughout the CLI.
@@ -29,14 +30,14 @@ GRID_POINTS = {
 }
 
 
-def _print_hourly(data: dict) -> None:
+def _print_hourly(data: ForecastData) -> None:
     """
     Print a simple summary of hourly forecast data to the console.
 
     Args:
         data (dict): The forecast data dictionary as returned by the API.
     """
-    periods = data.get("properties", {}).get("periods", [])
+    periods = getattr(getattr(data, "properties", {}), "periods", [])
     for period in periods:
         temp = period.get("temperature")
         unit = period.get("temperatureUnit")
@@ -45,14 +46,14 @@ def _print_hourly(data: dict) -> None:
         print(f"{start}: {temp}{unit} - {short}")
 
 
-def _print_daily(data: dict) -> None:
+def _print_daily(data: ForecastData) -> None:
     """
     Print a simple summary of 12-hour forecast data to the console.
 
     Args:
         data (dict): The forecast data dictionary as returned by the API.
     """
-    periods = data.get("properties", {}).get("periods", [])
+    periods = getattr(getattr(data, "properties", {}), "periods", [])
     for period in periods:
         name = period.get("name")
         temp = period.get("temperature")
@@ -112,10 +113,16 @@ def main(argv: Optional[list[str]] = None) -> None:
         api.update_all_forecasts(args.location.lower())
     elif args.command == "show-hourly":
         data = api.load_cached_data(f"{args.location}_CACHED_HOURLY_DATA.json")
-        _print_hourly(data)
+        if data is not None:
+            _print_hourly(data)
+        else:
+            print("No cached hourly data found for the selected location.")
     elif args.command == "show-daily":
         data = api.load_cached_data(f"{args.location}_CACHED_FORCAST_DATA.json")
-        _print_daily(data)
+        if data is not None:
+            _print_daily(data)
+        else:
+            print("No cached daily data found for the selected location.")
     else:
         parser.print_help()
 
