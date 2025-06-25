@@ -1,6 +1,6 @@
 from pathlib import Path
 from fastapi import FastAPI
-from fastapi.staticfiles import StaticFiles
+# from fastapi.staticfiles import StaticFiles
 
 from weather import api, models
 
@@ -35,4 +35,4 @@ async def update_weather_api(location: str):
     return {"message": "Weather data updated successfully."}
 
 
-app.mount("/", StaticFiles(directory=str(html_dir), html=True), name="static")
+# app.mount("/", StaticFiles(directory=str(html_dir), html=True), name="static")
