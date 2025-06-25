@@ -2,7 +2,7 @@ from pathlib import Path
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 
-from Weather import api, models
+from weather import api, models
 
 app = FastAPI()
 

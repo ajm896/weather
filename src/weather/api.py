@@ -24,7 +24,7 @@ import logging
 import requests
 import json
 
-from Weather import models
+from weather import models
 
 # Base URL for NWS gridpoint API requests
 BASE_URL = "https://api.weather.gov/gridpoints/GSP/"

@@ -17,8 +17,8 @@ from __future__ import annotations
 import argparse
 from typing import Optional
 
-from Weather import api
-from Weather.models import ForecastData
+from weather import api
+from weather.models import ForecastData
 
 # Mapping from location labels to NWS grid coordinates
 # used throughout the CLI.
@@ -69,7 +69,7 @@ def main(argv: Optional[list[str]] = None) -> None:
     Args:
         argv (Optional[list[str]]): List of command-line arguments. If None, uses sys.argv.
     """
-    parser = argparse.ArgumentParser(description="Weather forecast utilities")
+    parser = argparse.ArgumentParser(description="weather forecast utilities")
 
     sub_cmd = parser.add_subparsers(dest="command")
 
