@@ -7,7 +7,7 @@ from Weather import api, models
 app = FastAPI()
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
-html_dir = PROJECT_ROOT / "static" / "html"
+html_dir = PROJECT_ROOT / "static"
 
 
 def get_weather_data(location: str) -> models.ForecastData | None:
