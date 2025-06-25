@@ -144,12 +144,24 @@ function fetchWeatherData(location) {
 // Initialize the page
 document.addEventListener('DOMContentLoaded', function () {
     const locationSelect = document.getElementById('location-select');
+    const updateButton = document.getElementById('fetch-weather-button');
 
     // Set up event listener for location changes
     locationSelect.addEventListener('change', function () {
         currentLocation = this.value;
         fetchWeatherData(currentLocation);
     });
+
+    updateButton.addEventListener('click', function () {
+        fetch(`${API_URL}/${currentLocation}/update`).then(res => {
+            if (!res.ok) throw new Error(res.statusText);
+            document.location.reload();
+        }).catch(err => {
+            console.error('Error updating weather data:', err);
+            alert('Failed to update weather data. Please try again later.');
+        });
+    });
+
 
     // Load initial weather data
     fetchWeatherData(currentLocation);

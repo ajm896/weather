@@ -26,4 +26,13 @@ async def weather_api(location: str):
     return {"weatherData": forecast_data}
 
 
+@app.get("/api/weather/{location}/update")
+async def update_weather_api(location: str):
+    """
+    Updates the weather data for a given location.
+    """
+    api.update_all_forecasts(location=location)
+    return {"message": "Weather data updated successfully."}
+
+
 app.mount("/", StaticFiles(directory=str(html_dir), html=True), name="static")
