@@ -1,0 +1,12 @@
+{
+	local_certs
+}
+
+localhost {
+	root * ./static
+	file_server
+
+	handle /api/* {
+		reverse_proxy :8000
+	}
+}

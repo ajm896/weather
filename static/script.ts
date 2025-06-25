@@ -1,6 +1,6 @@
 // Weather data fetching and display script
 // replace with your real endpoint
-const API_URL = 'http://127.0.0.1:8000/api/weather';
+const API_URL = '/api/weather';
 
 let currentLocation = 'home'; // Default location
 
@@ -83,6 +83,14 @@ async function fetchWeatherData(location: string) {
                 shortForecast.textContent = f.shortForecast || f.detailedForecast || 'No forecast available';
                 shortForecast.className = 'text-white/80 text-sm';
 
+                // Add icon if available
+                if (f.icon) {
+                    const icon = document.createElement('img');
+                    icon.src = f.icon;
+                    icon.alt = f.name;
+                    icon.className = 'w-12 h-12 mb-2';
+                    card.appendChild(icon);
+                }
 
 
                 // Assemble the card

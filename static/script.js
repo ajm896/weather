@@ -1,7 +1,7 @@
 "use strict";
 // Weather data fetching and display script
 // replace with your real endpoint
-const API_URL = 'http://127.0.0.1:8000/api/weather';
+const API_URL = '/api/weather';
 let currentLocation = 'home'; // Default location
 async function fetchWeatherData(location) {
     const weatherContainer = document.getElementById('weather');
@@ -69,6 +69,14 @@ async function fetchWeatherData(location) {
                 const shortForecast = document.createElement('p');
                 shortForecast.textContent = f.shortForecast || f.detailedForecast || 'No forecast available';
                 shortForecast.className = 'text-white/80 text-sm';
+                // Add icon if available
+                if (f.icon) {
+                    const icon = document.createElement('img');
+                    icon.src = f.icon;
+                    icon.alt = f.name;
+                    icon.className = 'w-12 h-12 mb-2';
+                    card.appendChild(icon);
+                }
                 // Assemble the card
                 card.appendChild(periodName);
                 card.appendChild(periodDate);
@@ -114,7 +122,7 @@ async function fetchWeatherData(location) {
         errorTitle.textContent = 'Error Loading Weather Data';
         errorTitle.className = 'text-xl font-semibold text-white mb-2 text-center';
         const errorMessage = document.createElement('p');
-        errorMessage.textContent = err.message;
+        errorMessage.textContent = (err instanceof Error) ? err.message : String(err);
         errorMessage.className = 'text-white/80 text-center';
         errorContainer.appendChild(errorIcon);
         errorContainer.appendChild(errorTitle);
