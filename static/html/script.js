@@ -59,8 +59,13 @@ function fetchWeatherData(location) {
 
                     // Create card content
                     const periodName = document.createElement('h3');
-                    periodName.textContent = f.name;
+                    periodName.textContent = f.name; // Display name and date
                     periodName.className = 'text-xl font-semibold text-white mb-2';
+
+                    // Create card content
+                    const periodDate = document.createElement('p');
+                    periodDate.textContent = f.startTime.split('T')[0]; // Display date
+                    periodDate.className = 'text-sm text-white/80 mb-2';
 
                     const temperature = document.createElement('div');
                     temperature.textContent = `${f.temperature}°F`;
@@ -70,6 +75,14 @@ function fetchWeatherData(location) {
                     shortForecast.textContent = f.shortForecast || f.detailedForecast || 'No forecast available';
                     shortForecast.className = 'text-white/80 text-sm';
 
+
+
+                    // Assemble the card
+                    card.appendChild(periodName);
+                    card.appendChild(periodDate);
+                    card.appendChild(temperature);
+                    card.appendChild(shortForecast);
+
                     // Add wind info if available
                     if (f.windSpeed && f.windDirection) {
                         const windInfo = document.createElement('div');
@@ -77,11 +90,6 @@ function fetchWeatherData(location) {
                         windInfo.className = 'text-white/70 text-xs mt-2';
                         card.appendChild(windInfo);
                     }
-
-                    // Assemble the card
-                    card.appendChild(periodName);
-                    card.appendChild(temperature);
-                    card.appendChild(shortForecast);
 
                     gridContainer.appendChild(card);
                 });
