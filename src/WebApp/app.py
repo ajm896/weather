@@ -32,10 +32,10 @@ async def weather_api(location: str):
     return {"weatherData": forecast_data}
 
 
-@app.get("/v1/api/weather/{location}/update")
-async def update_weather_api(location: str):
+@app.get("/v1/api/weather/update")
+async def update_weather_api():
     """
     Updates the weather data for a given location.
     """
-    api.update_all_forecasts(location=location)
+    api.update_all_forecasts(["home", "work", "church", "ehhs"])
     return {"message": "Weather data updated successfully."}

@@ -116,7 +116,7 @@ def main(argv: Optional[list[str]] = None) -> None:
     args = parser.parse_args(argv)
 
     if args.command == "update-all":
-        api.update_all_forecasts(args.location.lower())
+        api.update_all_forecasts(["home", "work", "church", "ehhs"])
     elif args.command == "show-hourly":
         data = api.load_cached_data(f"{args.location}_CACHED_HOURLY_DATA.json")
         if data is not None:

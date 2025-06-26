@@ -150,7 +150,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (updateButton) {
         updateButton.addEventListener('click', async function () {
             try {
-                const res = await fetch(`${API_URL}/${currentLocation}/update`);
+                const res = await fetch(`${API_URL}/update`);
                 if (!res.ok)
                     throw new Error(res.statusText);
                 document.location.reload();

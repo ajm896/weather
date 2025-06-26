@@ -22,6 +22,7 @@ Key Functions
 ``load_cached_data(filename)`` – load cached forecast data
 ``cache_forecast(data, filename)`` – save forecast data to ``data/``
 """
+
 import logging
 import requests
 import json
@@ -47,7 +48,7 @@ CACHED_FORCAST_DATA = "cached_forecast_data.json"
 CACHED_RAW_DATA = "cached_raw_data.json"
 
 
-def update_all_forecasts(location: str) -> None:
+def update_all_forecasts(locations: list[str]) -> None:
     """
     Update all forecast data by fetching from the NWS API and caching the
     results locally for a given location.
@@ -60,14 +61,19 @@ def update_all_forecasts(location: str) -> None:
     gridpoint data from the NWS API for the specified location, then saves each
     to its respective cache file in the ``data/`` directory.
     """
-    print("Fetching latest forecast data...")
-    forecast_data = fetch_forecast(GRID_POINTS[location])
-    hourly_forecast_data = fetch_hourly_forecast(GRID_POINTS[location])
-    gridpoint_raw_data = fetch_gridpoint_raw_data(GRID_POINTS[location])
+    for location in locations:
+        if location not in GRID_POINTS:
+            logging.error(f"Unknown location: {location}")
+            continue
 
-    cache_forecast(forecast_data, f"{location}_CACHED_FORECAST_DATA.json")
-    cache_forecast(hourly_forecast_data, f"{location}_CACHED_HOURLY_DATA.json")
-    cache_forecast(gridpoint_raw_data, f"{location}_CACHED_RAW_DATA.json")
+        print("Fetching latest forecast data...")
+        forecast_data = fetch_forecast(GRID_POINTS[location])
+        hourly_forecast_data = fetch_hourly_forecast(GRID_POINTS[location])
+        gridpoint_raw_data = fetch_gridpoint_raw_data(GRID_POINTS[location])
+
+        cache_forecast(forecast_data, f"{location}_CACHED_FORECAST_DATA.json")
+        cache_forecast(hourly_forecast_data, f"{location}_CACHED_HOURLY_DATA.json")
+        cache_forecast(gridpoint_raw_data, f"{location}_CACHED_RAW_DATA.json")
 
     print("All forecasts updated.")
 
@@ -146,25 +152,15 @@ def load_cached_data(filename: str) -> models.ForecastData | None:
                 geojson_data = models.Gridpoint12hForecastGeoJson(**raw_data)
                 return models.ForecastData(type="12h", data=geojson_data)
             elif "HOURLY_DATA" in filename:  # Hourly forecast
-                hourly_geojson_data = (
-                    models.GridpointHourlyForecastGeoJson(**raw_data)
-                )
-                return models.ForecastData(
-                    type="hourly", data=hourly_geojson_data
-                )
+                hourly_geojson_data = models.GridpointHourlyForecastGeoJson(**raw_data)
+                return models.ForecastData(type="hourly", data=hourly_geojson_data)
             elif "RAW_DATA" in filename:  # Raw gridpoint data
                 raw_geojson_data = models.GridpointGeoJson(**raw_data)
-                return models.ForecastData(
-                    type="gridpoint", data=raw_geojson_data
-                )
+                return models.ForecastData(type="gridpoint", data=raw_geojson_data)
             else:
                 # Default to 12h forecast if pattern doesn't match
-                default_geojson_data = (
-                    models.Gridpoint12hForecastGeoJson(**raw_data)
-                )
-                return models.ForecastData(
-                    type="12h", data=default_geojson_data
-                )
+                default_geojson_data = models.Gridpoint12hForecastGeoJson(**raw_data)
+                return models.ForecastData(type="12h", data=default_geojson_data)
 
     except FileNotFoundError:
         return None
