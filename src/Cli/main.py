@@ -1,15 +1,19 @@
-"""
-Command line interface for the weather utilities.
+"""Command line interface for the weather utilities.
 
-This module provides a CLI for interacting with weather forecast data using the utilities in utils.api. It allows users to fetch and cache forecasts, and display hourly or daily summaries for predefined locations.
+This module fetches forecasts from the National Weather Service API,
+caches them locally and prints summaries. Several predefined locations
+are available.
 
-Functions:
-    _print_hourly(data): Print a summary of hourly forecast data.
-    _print_daily(data): Print a summary of 12-hour forecast data.
-    main(argv): Entry point for the CLI, parses arguments and dispatches commands.
+Functions
+---------
+``_print_hourly(data)`` – print a summary of hourly forecast data.
+``_print_daily(data)`` – print a summary of 12‑hour forecast data.
+``main(argv)`` – entry point that parses arguments and dispatches commands.
 
-Usage:
-    python main.py {update-all, show-hourly, show-daily} [--location LOCATION]
+Usage
+-----
+``python -m Cli.main {update-all, show-hourly, show-daily} [--location
+LOCATION]``
 """
 
 from __future__ import annotations
@@ -64,10 +68,12 @@ def _print_daily(data: ForecastData) -> None:
 
 def main(argv: Optional[list[str]] = None) -> None:
     """
-    Entry point for the CLI. Parses command-line arguments and dispatches to the appropriate command.
+    Entry point for the CLI. Parses command-line arguments and dispatches to
+    the appropriate command.
 
     Args:
-        argv (Optional[list[str]]): List of command-line arguments. If None, uses sys.argv.
+        argv (Optional[list[str]]): List of command-line arguments. If None,
+            uses ``sys.argv``.
     """
     parser = argparse.ArgumentParser(description="weather forecast utilities")
 
@@ -118,7 +124,8 @@ def main(argv: Optional[list[str]] = None) -> None:
         else:
             print("No cached hourly data found for the selected location.")
     elif args.command == "show-daily":
-        data = api.load_cached_data(f"{args.location}_CACHED_FORCAST_DATA.json")
+        cache_file = f"{args.location}_CACHED_FORCAST_DATA.json"
+        data = api.load_cached_data(cache_file)
         if data is not None:
             _print_daily(data)
         else:
