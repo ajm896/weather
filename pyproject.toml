@@ -16,7 +16,8 @@ dependencies = [
     "types-requests>=2.32.4.20250611",
 ]
 [project.scripts]
-cli = "Cli.main:main"
+cli = "cli.main:main"
+gui = "gui.app:main"
 
 [build-system]
 requires = ["hatchling"]
