@@ -1,0 +1,43 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "reload waybar",
+			"type": "shell",
+			"command": "killall -SIGUSR2 waybar",
+			"problemMatcher": [],
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			}
+		},
+		{
+			"type": "docker-build",
+			"label": "docker-build",
+			"platform": "python",
+			"dockerBuild": {
+				"tag": "weather:latest",
+				"dockerfile": "${workspaceFolder}/Dockerfile",
+				"context": "${workspaceFolder}",
+				"pull": true
+			}
+		},
+		{
+			"type": "docker-run",
+			"label": "docker-run: debug",
+			"dependsOn": [
+				"docker-build"
+			],
+			"python": {
+				"args": [
+					"src.webapp.app:app",
+					"--host",
+					"0.0.0.0",
+					"--port",
+					"8000"
+				],
+				"module": "uvicorn"
+			}
+		}
+	]
+}

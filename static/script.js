@@ -1,7 +1,7 @@
 "use strict";
 // Weather data fetching and display script
 // replace with your real endpoint
-const API_URL = '/api/weather';
+const API_URL = 'http://weather-api.localhost/v1/api/weather';
 let currentLocation = 'home'; // Default location
 async function fetchWeatherData(location) {
     const weatherContainer = document.getElementById('weather');

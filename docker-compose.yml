@@ -1,0 +1,45 @@
+services:
+    traefik:
+        image: traefik:v3.4.1
+        command:
+            - --api.insecure=true
+            - --providers.docker=true
+            - --entrypoints.web.address=:80
+        ports:
+            - "80:80"
+            - "8080:8080"
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock:ro
+        restart: unless-stopped
+        networks:
+            - weather-app
+    weather-api:
+        image: web-app:latest
+        labels:
+            - "traefik.enable=true"
+            - "traefik.http.routers.weather-api.rule=Host(`weather-api.localhost`)"
+            - "traefik.http.services.weather-api.loadbalancer.server.port=8000"
+        networks:
+            - weather-app
+        restart: unless-stopped
+    weather-frontend:
+        image: caddy:latest
+        restart: unless-stopped
+        labels:
+            - "traefik.enable=true"
+            - "traefik.http.routers.weather-frontend.rule=Host(`weather.localhost`)"
+            - "traefik.http.services.weather-frontend.loadbalancer.server.port=8081"
+        volumes:
+        - ./conf:/etc/caddy
+        - ./static:/srv
+        - caddy_data:/data
+        - caddy_config:/config
+        networks:
+            - weather-app
+networks:
+    weather-app:
+volumes:
+    caddy_data:
+        driver: local
+    caddy_config:
+        driver: local
