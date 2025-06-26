@@ -66,7 +66,7 @@ def update_all_forecasts(locations: list[str]) -> None:
             logging.error(f"Unknown location: {location}")
             continue
 
-        print("Fetching latest forecast data...")
+        print(f"Fetching latest forecast data for {location}...")
         forecast_data = fetch_forecast(GRID_POINTS[location])
         hourly_forecast_data = fetch_hourly_forecast(GRID_POINTS[location])
         gridpoint_raw_data = fetch_gridpoint_raw_data(GRID_POINTS[location])

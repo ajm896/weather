@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import StringVar, ttk
 from tkinter.scrolledtext import ScrolledText
+from turtle import update
 
 from weather import api
 
@@ -28,6 +29,10 @@ def search_weather(search_box, forecast, location_state):
     search_box.delete(0, tk.END)
 
 
+def update_weather():
+    api.update_all_forecasts(["home", "work", "church", "ehhs"])
+
+
 def main():
     root = tk.Tk()
     frm = ttk.Frame(root, padding=10)
@@ -36,6 +41,9 @@ def main():
     location_state.set("home")  # Default location
     label = ttk.Label(frm, textvariable=location_state, font=("Arial", 24))
     label.pack(pady=10)
+
+    update_button = ttk.Button(frm, text="Update Weather Data", command=update_weather)
+    update_button.pack(pady=10)
 
     search_box = ttk.Entry(
         frm,
