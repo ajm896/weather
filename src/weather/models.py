@@ -1,22 +1,29 @@
 """
 models.py
 
-Data models for weather forecast and gridpoint data, using Pydantic for validation and serialization.
+Data models for weather forecast and gridpoint data, using Pydantic for
+validation and serialization.
 
-This module defines a set of Pydantic models representing the structure of weather forecast data as returned by the National Weather Service (NWS) API and similar sources. The models cover both 12-hour and hourly forecast periods, quantitative value layers, and GeoJSON features for spatial data. These models are used for parsing, validating, and working with weather data in a structured way throughout the application.
+This module defines a set of Pydantic models representing the structure of
+weather forecast data as returned by the National Weather Service (NWS) API and
+similar sources. The models cover both 12-hour and hourly forecast periods,
+quantitative value layers and GeoJSON features for spatial data. These models
+are used for parsing, validating and working with weather data in a structured
+way throughout the application.
 
 Classes:
-    _QuantitativeValue: Represents a value with units (e.g., temperature, elevation).
-    _Gridpoint12hForecastPeriod: Represents a single 12-hour forecast period.
-    _GeoJsonGeometry: Represents the geometry section of a GeoJSON feature.
-    _Gridpoint12hForecast: Represents a 12-hour forecast for a gridpoint.
-    _GridpointHourlyForecastPeriod: Represents a single hourly forecast period.
-    _GridpointHourlyForecast: Represents an hourly forecast for a gridpoint.
-    _GridpointQuantitativeValueLayer: Represents a layer of quantitative values for a gridpoint (e.g., temperature, humidity).
-    _Gridpoint: Represents raw forecast data for a 2.5km grid square, including many possible weather data layers.
-    GridpointGeoJson: Represents a GeoJSON feature for gridpoint data.
-    Gridpoint12hForecastGeoJson: Represents a GeoJSON feature for 12-hour forecast data.
-    GridpointHourlyForecastGeoJson: Represents a GeoJSON feature for hourly forecast data.
+    _QuantitativeValue – value with units (e.g., temperature, elevation)
+    _Gridpoint12hForecastPeriod – a single 12-hour forecast period
+    _GeoJsonGeometry – the geometry section of a GeoJSON feature
+    _Gridpoint12hForecast – a 12-hour forecast for a gridpoint
+    _GridpointHourlyForecastPeriod – a single hourly forecast period
+    _GridpointHourlyForecast – an hourly forecast for a gridpoint
+    _GridpointQuantitativeValueLayer – a layer of quantitative values for a
+        gridpoint (e.g., temperature, humidity)
+    _Gridpoint – raw forecast data for a 2.5km grid square
+    GridpointGeoJson – a GeoJSON feature for gridpoint data
+    Gridpoint12hForecastGeoJson – a GeoJSON feature for 12-hour data
+    GridpointHourlyForecastGeoJson – a GeoJSON feature for hourly data
 """
 
 from datetime import datetime
@@ -26,11 +33,13 @@ from typing import Any, Union, Literal
 
 class _QuantitativeValue(BaseModel):
     """
-    Represents a quantitative value with units, such as temperature, elevation, or probability of precipitation.
+    Represents a quantitative value with units, such as temperature,
+    elevation or probability of precipitation.
 
     Attributes:
         value (int | float): The numeric value.
-        unitCode (str): The unit of measurement (e.g., 'wmoUnit:degC', 'wmoUnit:percent').
+        unitCode (str): The unit of measurement (e.g., 'wmoUnit:degC',
+            'wmoUnit:percent').
     """
 
     value: int | float
@@ -43,7 +52,8 @@ class _QuantitativeValue(BaseModel):
 
 class _Gridpoint12hForecastPeriod(BaseModel):
     """
-    Represents a single 12-hour forecast period, including temperature, precipitation, wind, and forecast text.
+    Represents a single 12-hour forecast period, including temperature,
+    precipitation, wind and forecast text.
 
     Attributes:
         number (int): Sequence number of the period.
@@ -54,7 +64,8 @@ class _Gridpoint12hForecastPeriod(BaseModel):
         temperature (int | None): Temperature value.
         temperatureUnit (str | None): Unit of temperature.
         temperatureTrend (str | None): Trend of temperature (e.g., 'rising').
-        probabilityOfPrecipitation (_QuantitativeValue | None): Probability of precipitation.
+        probabilityOfPrecipitation (_QuantitativeValue | None):
+            Probability of precipitation.
         windSpeed (str | None): Wind speed as a string (e.g., '5 to 10 mph').
         windDirection (str | None): Wind direction (e.g., 'NW').
         icon (str | None): URL to an icon representing the forecast.
@@ -79,12 +90,16 @@ class _Gridpoint12hForecastPeriod(BaseModel):
 
     def __str__(self) -> str:
         """Return ``"{name}: {forecast}"`` for quick display."""
-        return f"{self.name}: {self.detailedForecast or self.shortForecast or 'No forecast available'}"
+        forecast = self.detailedForecast or self.shortForecast or (
+            "No forecast available"
+        )
+        return f"{self.name}: {forecast}"
 
 
 class _GeoJsonGeometry(BaseModel):
     """
-    Represents the geometry section of a GeoJSON feature, typically a polygon or multipolygon.
+    Represents the geometry section of a GeoJSON feature, typically a
+    polygon or multipolygon.
 
     Attributes:
         type (str): The geometry type (e.g., 'Polygon').
@@ -96,12 +111,16 @@ class _GeoJsonGeometry(BaseModel):
 
     def __str__(self) -> str:
         """Return a readable summary of the geometry."""
-        return f"Geometry:\ntype: {self.type}\n\nCoordinates:\n{self.coordinates})"
+        return (
+            f"Geometry:\ntype: {self.type}\n\nCoordinates:\n"
+            f"{self.coordinates})"
+        )
 
 
 class _Gridpoint12hForecast(BaseModel):
     """
-    Represents a 12-hour forecast for a gridpoint, including metadata and a list of forecast periods.
+    Represents a 12-hour forecast for a gridpoint, including metadata and a
+    list of forecast periods.
 
     Attributes:
         units (str): Units of measurement.
@@ -139,7 +158,8 @@ Periods:
 
 class _GridpointHourlyForecastPeriod(BaseModel):
     """
-    Represents a single hourly forecast period, including temperature, precipitation, wind, and forecast text.
+    Represents a single hourly forecast period including temperature,
+    precipitation, wind and forecast text.
 
     Attributes:
         number (int): Sequence number of the period.
@@ -150,7 +170,8 @@ class _GridpointHourlyForecastPeriod(BaseModel):
         temperature (int | None): Temperature value.
         temperatureUnit (str | None): Unit of temperature.
         temperatureTrend (str | None): Trend of temperature.
-        probabilityOfPrecipitation (_QuantitativeValue | None): Probability of precipitation.
+        probabilityOfPrecipitation (_QuantitativeValue | None):
+            Probability of precipitation.
         windSpeed (str | None): Wind speed as a string.
         windDirection (str | None): Wind direction.
         icon (str | None): URL to an icon representing the forecast.
@@ -176,12 +197,16 @@ class _GridpointHourlyForecastPeriod(BaseModel):
     def __str__(self) -> str:
         """Return the start time and brief forecast for one hour."""
         starttime = datetime.fromisoformat(self.startTime)
-        return f"{starttime.ctime()}: {self.detailedForecast or self.shortForecast or 'No forecast available'}"
+        summary = self.detailedForecast or self.shortForecast or (
+            "No forecast available"
+        )
+        return f"{starttime.ctime()}: {summary}"
 
 
 class _GridpointHourlyForecast(BaseModel):
     """
-    Represents an hourly forecast for a gridpoint, including metadata and a list of hourly forecast periods.
+    Represents an hourly forecast for a gridpoint, including metadata and a
+    list of hourly forecast periods.
 
     Attributes:
         units (str): Units of measurement.
@@ -190,7 +215,8 @@ class _GridpointHourlyForecast(BaseModel):
         updateTime (str): ISO8601 timestamp of last update.
         validTimes (str): Valid time range for the forecast.
         elevation (_QuantitativeValue): Elevation of the gridpoint.
-        periods (list[_GridpointHourlyForecastPeriod]): List of hourly forecast periods.
+        periods (list[_GridpointHourlyForecastPeriod]):
+            List of hourly forecast periods.
     """
 
     units: str
@@ -212,7 +238,7 @@ UpdateTime: {self.updateTime}
 ValidTimes: {self.validTimes}
 Elevation: {self.elevation}
 
-Periods: 
+Periods:
 {"\n\n".join(str(period) for period in self.periods)}
 """
 
@@ -228,11 +254,13 @@ class _GridpointQuantitativeValue(BaseModel):
 
 class _GridpointQuantitativeValueLayer(BaseModel):
     """
-    Represents a layer of quantitative value data for a gridpoint, such as temperature or humidity.
+    Represents a layer of quantitative value data for a gridpoint, such as
+    temperature or humidity.
 
     Attributes:
         uom (str): Unit of measurement for the layer.
-        values (list[dict[str, int | float | str]]): List of value dictionaries for the layer.
+        values (list[dict[str, int | float | str]]):
+            List of value dictionaries for the layer.
     """
 
     uom: str
@@ -240,12 +268,14 @@ class _GridpointQuantitativeValueLayer(BaseModel):
 
     def __str__(self) -> str:
         """Return a line-per-value listing of the layer contents."""
-        return f"{self.uom.split(':')[1]}: \n{',\n'.join(str(value) for value in self.values)}"
+        values = ",\n".join(str(value) for value in self.values)
+        return f"{self.uom.split(':')[1]}: \n{values}"
 
 
 class _Gridpoint(BaseModel):
     """
-    Represents raw forecast data for a 2.5km grid square, including many possible weather data layers.
+    Represents raw forecast data for a 2.5km grid square, including many
+    possible weather data layers.
 
     Attributes:
         updateTime (str): ISO8601 timestamp of last update.
@@ -255,12 +285,18 @@ class _Gridpoint(BaseModel):
         gridId (str): Grid identifier.
         gridX (int): X coordinate of the gridpoint.
         gridY (int): Y coordinate of the gridpoint.
-        temperature (_GridpointQuantitativeValueLayer | None): Temperature data layer.
-        dewpoint (_GridpointQuantitativeValueLayer | None): Dewpoint data layer.
-        maxTemperature (_GridpointQuantitativeValueLayer | None): Max temperature data layer.
-        minTemperature (_GridpointQuantitativeValueLayer | None): Min temperature data layer.
-        relativeHumidity (_GridpointQuantitativeValueLayer | None): Relative humidity data layer.
-        apparentTemperature (_GridpointQuantitativeValueLayer | None): Apparent temperature data layer.
+        temperature (_GridpointQuantitativeValueLayer | None):
+            Temperature data layer.
+        dewpoint (_GridpointQuantitativeValueLayer | None):
+            Dewpoint data layer.
+        maxTemperature (_GridpointQuantitativeValueLayer | None):
+            Max temperature data layer.
+        minTemperature (_GridpointQuantitativeValueLayer | None):
+            Min temperature data layer.
+        relativeHumidity (_GridpointQuantitativeValueLayer | None):
+            Relative humidity data layer.
+        apparentTemperature (_GridpointQuantitativeValueLayer | None):
+            Apparent temperature data layer.
         # Additional layers may be present as described in the class docstring.
     """
 
@@ -309,7 +345,8 @@ apparentTemperature: {self.apparentTemperature}
 
 class GridpointGeoJson(BaseModel):
     """
-    Represents a GeoJSON feature for gridpoint data, including geometry and properties.
+    Represents a GeoJSON feature for gridpoint data, including geometry
+    and properties.
 
     Attributes:
         geometry (_GeoJsonGeometry): The geometry of the feature.
@@ -361,14 +398,17 @@ class GridpointHourlyForecastGeoJson(BaseModel):
     type: str
 
     def __str__(self) -> str:
-        """Return geometry and hourly forecast details separated by a blank line."""
+        """Return geometry and hourly forecast details separated by a
+        blank line."""
         return f"{self.geometry}\n\n{self.properties})"
 
 
 class ForecastData(BaseModel):
     type: Literal["gridpoint", "12h", "hourly"]
     data: Union[
-        GridpointGeoJson, Gridpoint12hForecastGeoJson, GridpointHourlyForecastGeoJson
+        GridpointGeoJson,
+        Gridpoint12hForecastGeoJson,
+        GridpointHourlyForecastGeoJson,
     ]
 
     def getForecast(self) -> dict[str, Any]:
