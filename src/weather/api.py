@@ -67,18 +67,18 @@ def update_all_forecasts(locations: list[str]) -> None:
             continue
 
         print(f"Fetching latest forecast data for {location}...")
-        forecast_data = fetch_forecast(GRID_POINTS[location])
-        hourly_forecast_data = fetch_hourly_forecast(GRID_POINTS[location])
-        gridpoint_raw_data = fetch_gridpoint_raw_data(GRID_POINTS[location])
+        forecast_data = _fetch_forecast(GRID_POINTS[location])
+        hourly_forecast_data = _fetch_hourly_forecast(GRID_POINTS[location])
+        gridpoint_raw_data = _fetch_gridpoint_raw_data(GRID_POINTS[location])
 
-        cache_forecast(forecast_data, f"{location}_CACHED_FORECAST_DATA.json")
-        cache_forecast(hourly_forecast_data, f"{location}_CACHED_HOURLY_DATA.json")
-        cache_forecast(gridpoint_raw_data, f"{location}_CACHED_RAW_DATA.json")
+        _cache_forecast(forecast_data, f"{location}_CACHED_FORECAST_DATA.json")
+        _cache_forecast(hourly_forecast_data, f"{location}_CACHED_HOURLY_DATA.json")
+        _cache_forecast(gridpoint_raw_data, f"{location}_CACHED_RAW_DATA.json")
 
     print("All forecasts updated.")
 
 
-def fetch_forecast(location: tuple[int, int]) -> dict[str, dict]:
+def _fetch_forecast(location: tuple[int, int]) -> dict[str, dict]:
     """
     Fetch the latest 12-hour forecast data from the NWS API for a
     given location.
@@ -95,7 +95,7 @@ def fetch_forecast(location: tuple[int, int]) -> dict[str, dict]:
     ).json()
 
 
-def fetch_hourly_forecast(location: tuple[int, int]) -> dict[str, dict]:
+def _fetch_hourly_forecast(location: tuple[int, int]) -> dict[str, dict]:
     """
     Fetch the latest hourly forecast data from the NWS API for a
     given location.
@@ -112,7 +112,7 @@ def fetch_hourly_forecast(location: tuple[int, int]) -> dict[str, dict]:
     ).json()
 
 
-def fetch_gridpoint_raw_data(location: tuple[int, int]) -> dict[str, dict]:
+def _fetch_gridpoint_raw_data(location: tuple[int, int]) -> dict[str, dict]:
     """
     Fetch the latest raw gridpoint forecast data from the NWS API for a
     given location.
@@ -150,17 +150,17 @@ def load_cached_data(filename: str) -> models.ForecastData | None:
             # create the appropriate model
             if "FORCAST_DATA" in filename:  # 12-hour forecast
                 geojson_data = models.Gridpoint12hForecastGeoJson(**raw_data)
-                return models.ForecastData(type="12h", data=geojson_data)
+                return models.ForecastData(kind="12h", data=geojson_data)
             elif "HOURLY_DATA" in filename:  # Hourly forecast
                 hourly_geojson_data = models.GridpointHourlyForecastGeoJson(**raw_data)
-                return models.ForecastData(type="hourly", data=hourly_geojson_data)
+                return models.ForecastData(kind="hourly", data=hourly_geojson_data)
             elif "RAW_DATA" in filename:  # Raw gridpoint data
                 raw_geojson_data = models.GridpointGeoJson(**raw_data)
-                return models.ForecastData(type="gridpoint", data=raw_geojson_data)
+                return models.ForecastData(kind="gridpoint", data=raw_geojson_data)
             else:
                 # Default to 12h forecast if pattern doesn't match
                 default_geojson_data = models.Gridpoint12hForecastGeoJson(**raw_data)
-                return models.ForecastData(type="12h", data=default_geojson_data)
+                return models.ForecastData(kind="12h", data=default_geojson_data)
 
     except FileNotFoundError:
         return None
@@ -169,7 +169,7 @@ def load_cached_data(filename: str) -> models.ForecastData | None:
         return None
 
 
-def cache_forecast(forecast_data, filename) -> None:
+def _cache_forecast(forecast_data, filename) -> None:
     """
     Cache the forecast data to a file in JSON format in the data/ directory.
 

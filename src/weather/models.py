@@ -27,8 +27,8 @@ Classes:
 """
 
 from datetime import datetime
-from pydantic import BaseModel
-from typing import Any, Union, Literal
+from pydantic import BaseModel, Discriminator, Field
+from typing import Annotated, Any, Union, Literal
 
 
 class _QuantitativeValue(BaseModel):
@@ -90,8 +90,8 @@ class _Gridpoint12hForecastPeriod(BaseModel):
 
     def __str__(self) -> str:
         """Return ``"{name}: {forecast}"`` for quick display."""
-        forecast = self.detailedForecast or self.shortForecast or (
-            "No forecast available"
+        forecast = (
+            self.detailedForecast or self.shortForecast or ("No forecast available")
         )
         return f"{self.name}: {forecast}"
 
@@ -111,10 +111,7 @@ class _GeoJsonGeometry(BaseModel):
 
     def __str__(self) -> str:
         """Return a readable summary of the geometry."""
-        return (
-            f"Geometry:\ntype: {self.type}\n\nCoordinates:\n"
-            f"{self.coordinates})"
-        )
+        return f"Geometry:\ntype: {self.type}\n\nCoordinates:\n{self.coordinates})"
 
 
 class _Gridpoint12hForecast(BaseModel):
@@ -132,6 +129,7 @@ class _Gridpoint12hForecast(BaseModel):
         periods (list[_Gridpoint12hForecastPeriod]): List of forecast periods.
     """
 
+    type: Literal["12h"] = "12h"
     units: str
     forecastGenerator: str
     generatedAt: str
@@ -197,8 +195,8 @@ class _GridpointHourlyForecastPeriod(BaseModel):
     def __str__(self) -> str:
         """Return the start time and brief forecast for one hour."""
         starttime = datetime.fromisoformat(self.startTime)
-        summary = self.detailedForecast or self.shortForecast or (
-            "No forecast available"
+        summary = (
+            self.detailedForecast or self.shortForecast or ("No forecast available")
         )
         return f"{starttime.ctime()}: {summary}"
 
@@ -357,7 +355,7 @@ class GridpointGeoJson(BaseModel):
     geometry: _GeoJsonGeometry
     properties: _Gridpoint
 
-    type: str
+    kind: Literal["gridpoint"] = Field(default="gridpoint")
 
     def __str__(self) -> str:
         """Return geometry followed by properties."""
@@ -376,7 +374,7 @@ class Gridpoint12hForecastGeoJson(BaseModel):
 
     geometry: _GeoJsonGeometry
     properties: _Gridpoint12hForecast
-    type: str
+    kind: Literal["12h"] = Field(default="12h")
 
     def __str__(self) -> str:
         """Return geometry and forecast details separated by a blank line."""
@@ -395,7 +393,7 @@ class GridpointHourlyForecastGeoJson(BaseModel):
 
     geometry: _GeoJsonGeometry
     properties: _GridpointHourlyForecast
-    type: str
+    kind: Literal["hourly"] = Field(default="hourly")
 
     def __str__(self) -> str:
         """Return geometry and hourly forecast details separated by a
@@ -404,11 +402,14 @@ class GridpointHourlyForecastGeoJson(BaseModel):
 
 
 class ForecastData(BaseModel):
-    type: Literal["gridpoint", "12h", "hourly"]
-    data: Union[
-        GridpointGeoJson,
-        Gridpoint12hForecastGeoJson,
-        GridpointHourlyForecastGeoJson,
+    kind: Literal["gridpoint", "12h", "hourly"]
+    data: Annotated[
+        Union[
+            GridpointGeoJson,
+            Gridpoint12hForecastGeoJson,
+            GridpointHourlyForecastGeoJson,
+        ],
+        Discriminator("kind"),
     ]
 
     def getForecast(self) -> dict[str, Any]:
@@ -419,4 +420,4 @@ class ForecastData(BaseModel):
         return self.data.properties.model_dump()
 
     def __str__(self):
-        return f"{self.type}: {self.data}"
+        return f"{self.kind}: {self.data}"
